@@ -2,50 +2,44 @@
 #include <stdlib.h>
 #include <string>
 
-void print_grid(int grid[7][6]);
-bool valid_colum(int grid[7][6], int column, int player);
+void drawGrid(int grid[7][6]);
+bool playTurn(int grid[7][6], int column, int player);
 
 int main(int argc, char** argv){
-    bool running = true;
-
-    const int line = 6;
-    const int column = 7;
-    int grid[column][line] = {};
-
-    for (int i = 0; i < 6; i++)
-        for (int j = 0; j < 7; j++)
-            grid[j][i] = 0;
+    int grille[7][6] = {};
+    std::string choix;
 
     int player = 1;
-    std::string choix("");
-    print_grid(grid);
+        drawGrid(grille);
 
-    while (running){
-        std::cout << "choix de la conole (" << player << ") : ";
+    while (true){
+        std::cout << "player_" << player << " -> col :";
         std::cin >> choix;
 
         if (choix == "exit"){
-            running = false;
             break;
         }
 
-        bool isvalid = false;
+        bool success = false;
 
         if (choix.size() == 1){
-            if (choix[0] >= '1' && choix[0] <= '7'){
-                int choix_column = choix[0] - '0';
-                isvalid = valid_colum(grid, choix_column, player);
+            if (choix[0] >= '0' && choix[0] <= '7'){
+                int col = choix[0]  - '0';
+
+                success = playTurn(grille, col, player);
             }
         }
 
-        system("CLS"); 
-        if (!isvalid){
-            std::cout << "votre jeux n'est pas bon recommencer\n";
-        } else {
+        system("CLS");
+
+        if (!success){
+            std::cout << "votre choix est incorrect\n";
+        } else{
             if (player == 1) player = 2;
             else player = 1;
         }
-        print_grid(grid);
+
+        drawGrid(grille);
     }
 
     return 0;
@@ -53,26 +47,29 @@ int main(int argc, char** argv){
 
 
 // 0, 1, 2
-void print_grid(int grid[7][6]){
-    for (int line = 0; line < 6; line++){
-        for (int column = 0; column < 7; column++){
-            if (grid[column][line] == 1){
-                std::cout << "\033[31m*\033[37m|";
-            } else if (grid[column][line] == 2){
-                std::cout << "\033[32m*\033[37m|";
-            } else {
-                std::cout << "\033[37m*\033[37m|";
+void drawGrid(int grille[7][6]){
+    for (int ligne = 0; ligne < 6; ligne++){
+        std::cout << "|";
+        for (int col = 0; col < 7; col++){
+            if (grille[col][ligne] == 1){
+                std::cout << "\033[31m*\033[37m";
+            } else 
+            if (grille[col][ligne] == 2){
+                std::cout << "\033[32m*\033[37m";
             }
+            else {
+                std::cout << "\033[37m*\033[37m";
+            }
+            std::cout << "|";
         }
-        std::cout << std::endl;
+        std::cout << "\n";
     }
 }
 
-bool valid_colum(int grid[7][6], int column, int player){
+bool playTurn(int grid[7][6], int column, int player){
     for (int line = 5 ; line >= 0; line--){
         if (grid[column - 1][line] == 0){
             grid[column - 1][line] = player;
-            print_grid(grid);
             return true;
         }
     }
